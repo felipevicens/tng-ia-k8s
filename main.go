@@ -1,49 +1,21 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
-	"time"
 	"tng-ia-k8s/api"
 
 	"github.com/gorilla/mux"
-
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
-	var kubeconfig *string
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		panic(err.Error())
-	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/nodes", api.GetNodes).Methods("GET")
 	router.HandleFunc("/pods", api.GetPods).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8000", router))
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
-	for {
+	/* for {
 		pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
@@ -94,12 +66,5 @@ func main() {
 		}
 
 		time.Sleep(4 * time.Second)
-	}
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
+	} */
 }
